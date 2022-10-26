@@ -42,6 +42,7 @@ export default class MyPlugin extends Plugin {
 		this.addCommand({
 			id: 'sample-editor-command',
 			name: 'Sample editor command',
+			hotkeys: [{modifiers: ["Alt", "Shift"], key: "k"}],
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				console.log(editor.getSelection());
 				editor.replaceSelection('<font style="color:salmon">' + editor.getSelection() + '</font>');
@@ -52,13 +53,10 @@ export default class MyPlugin extends Plugin {
 		this.addCommand({
 			id: 'open-sample-modal-complex',
 			name: 'Open sample modal (complex)',
-			hotkeys: [{modifiers: ["Alt", "Shift"], key: "k"}],
 			checkCallback: (checking: boolean) => {
 				// Conditions to check
 				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (markdownView) {
-					new Notice("Hotkey");
-					console.log("works")
 					// If checking is true, we're simply "checking" if the command can be run.
 					// If checking is false, then we want to actually perform the operation.
 					if (!checking) {
