@@ -35,10 +35,10 @@ export class FontColorSettingTab extends PluginSettingTab {
                 dropdown.addOptions(methods);
                 dropdown
                 .setValue(this.plugin.settings.fontColorMethods)
-                .onChange((highlightrMethod) => {
-                    this.plugin.settings.fontColorMethods = highlightrMethod;
+                .onChange((fontColorMethod) => {
+                    this.plugin.settings.fontColorMethods = fontColorMethod;
                     setTimeout(() => {
-                        dispatchEvent(new Event("Highlightr-NewCommand"));
+                        dispatchEvent(new Event("FontColor-NewCommand"));
                     }, 100);
                     this.plugin.saveSettings();
                     this.plugin.saveData(this.plugin.settings);
@@ -49,7 +49,7 @@ export class FontColorSettingTab extends PluginSettingTab {
         const stylesSetting = new Setting(containerEl);
 
         stylesSetting
-            .setName("Choose highlight style")
+            .setName("Choose color palette")
             .setDesc(
                 `Depending on your design aesthetic, you may want to customize the style of your highlights. Choose from an assortment of different highlighter styles by using the dropdown. Depending on your theme, this plugin's CSS may be overriden.`
             )
@@ -83,23 +83,23 @@ export class FontColorSettingTab extends PluginSettingTab {
         const fontColorSetting = new Setting(containerEl);
 
         fontColorSetting
-            .setName("Choose highlight colors")
-            .setClass("highlighterplugin-setting-item")
+            .setName("Choose font colors")
+            .setClass("fontcolorplugin-setting-item")
             .setDesc(
                 `Create new highlight colors by providing a color name and using the color picker to set the hex code value. Don't forget to save the color before exiting the color picker. Drag and drop the highlight color to change the order for your highlighter component.`
             );
 
         const colorInput = new TextComponent(fontColorSetting.controlEl);
         colorInput.setPlaceholder("Color name");
-        colorInput.inputEl.addClass("highlighter-settings-color");
+        colorInput.inputEl.addClass("fontcolor-settings-color");
 
         const valueInput = new TextComponent(fontColorSetting.controlEl);
         valueInput.setPlaceholder("Color hex code");
-        valueInput.inputEl.addClass("highlighter-settings-value");
+        valueInput.inputEl.addClass("fontcolor-settings-value");
 
         fontColorSetting
             .addButton((button) => {
-                button.setClass("highlightr-color-picker");
+                button.setClass("fontcolor-color-picker");
             })
             .then(() => {
                 let input = valueInput.inputEl;
@@ -111,7 +111,7 @@ export class FontColorSettingTab extends PluginSettingTab {
 
                 let colorHex;
                 let pickrCreate = new Pickr({
-                el: ".highlightr-color-picker",
+                el: ".fontcolor-color-picker",
                 theme: "nano",
                 swatches: colorMap,
                 defaultRepresentation: "HEXA",
@@ -180,9 +180,9 @@ export class FontColorSettingTab extends PluginSettingTab {
             })
             .addButton((button) => {
                 button
-                .setClass("HighlightrSettingsButton")
-                .setClass("HighlightrSettingsButtonAdd")
-                .setIcon("highlightr-save")
+                .setClass("FontColorSettingsButton")
+                .setClass("FontColorSettingsButtonAdd")
+                .setIcon("font-color-save")
                 .setTooltip("Save")
                 .onClick(async (buttonEl: any) => {
                     let color = colorInput.inputEl.value.replace(" ", "-");
@@ -246,14 +246,14 @@ export class FontColorSettingTab extends PluginSettingTab {
             .setDesc(this.plugin.settings.fontColors[fontColor])
             .addButton((button) => {
                 button
-                    .setClass("HighlightrSettingsButton")
-                    .setClass("HighlightrSettingsButtonDelete")
-                    .setIcon("highlightr-delete")
+                    .setClass("FontColorSettingsButton")
+                    .setClass("FontColorSettingsButtonDelete")
+                    .setIcon("font-color-delete")
                     .setTooltip("Remove")
                     .onClick(async () => {
                         new Notice(`${fontColor} color deleted`);
                         (this.app as any).commands.removeCommand(
-                            `highlightr-plugin:${fontColor}`
+                            `font-color-plugin:${fontColor}`
                         );
                         delete this.plugin.settings.fontColors[fontColor];
                         this.plugin.settings.fontColorOrder.remove(fontColor);

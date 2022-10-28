@@ -3,7 +3,8 @@ import { wait } from "../utils/util"
 
 import fontColorMenu from "../ui/fontColorMenu"
 import { FontColorSettingTab } from "../settings/settingsTab";
-import DEFAULT_SETTINGS, { FontColorSettings } from "../settings/settingsData";
+import { FontColorSettings } from "../settings/settingsData";
+import DEFAULT_SETTINGS from "../settings/settingsData";
 import { EnhancedApp, EnhancedEditor } from "../settings/types";
 import contextMenu from "./contextMenu";
 
@@ -19,30 +20,15 @@ export default class FontColorPlugin extends Plugin {
 	settings: FontColorSettings;
 
 	async onload() {
-		console.log(`Highlightr v${this.manifest.version} loaded`);
+		console.log(`Font Color v${this.manifest.version} loaded`);
 		addIcons();
-	
-		this.app.workspace.onLayoutReady(() => {
-		  this.reloadStyles(this.settings);
-		  createFontColorIcons(this.settings, this);
-		});
+
+		await this.loadSettings()
 
 		// Agregamos la opcion de font color al editor menu (right click menu)
 		this.registerEvent(
 			this.app.workspace.on("editor-menu", this.handleFontColorInContextMenu)
 		)
-		
-		this.addCommand({
-			id: 'change-color',
-			name: 'Change color',
-			hotkeys: [{modifiers: ["Alt", "Shift"], key: "k"}],
-			editorCallback: (editor: Editor) => {
-				new Notice("Hotkey Refreshed 1");
-				console.log("Refreshed 1")
-				console.log(editor.getSelection());
-				editor.replaceSelection('<font style="color:salmon">' + editor.getSelection() + '</font>');
-			}
-		});
 	
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new FontColorSettingTab(this.app, this));
@@ -52,10 +38,11 @@ export default class FontColorPlugin extends Plugin {
 			id: "font-color-plugin-menu",
 			name: "Open Font Color",
 			icon: "font-color-pen",
+			hotkeys: [{modifiers: ["Alt", "Shift"], key: "k"}],
 			editorCallback: (editor: EnhancedEditor) => {
-			!document.querySelector(".menu.fontColorContainer")
-				? fontColorMenu(this.app, this.settings, editor)
-				: true;
+				!document.querySelector(".menu.fontColorContainer")
+					? fontColorMenu(this.app, this.settings, editor)
+					: true;
 			},
 		});
 
@@ -64,24 +51,9 @@ export default class FontColorPlugin extends Plugin {
 			this.generateCommands(this.editor);
 			createFontColorIcons(this.settings, this);
 		});
-		
+
 		this.generateCommands(this.editor);
 		this.refresh();
-
-
-
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			hotkeys: [{modifiers: ["Alt", "Shift"], key: "k"}],
-			editorCallback: (editor: Editor) => {
-				new Notice("Hotkey Refreshed 1");
-				console.log("Refreshed 1")
-				console.log(editor.getSelection());
-				editor.replaceSelection('<font style="color:salmon">' + editor.getSelection() + '</font>');
-			}
-		});
 	}
 		
 	reloadStyles(settings: FontColorSettings) {
@@ -105,8 +77,10 @@ export default class FontColorPlugin extends Plugin {
 	};
 
 	generateCommands(editor: Editor) {
+		console.log('Settings', this.settings)	
 		this.settings.fontColorOrder.forEach((fontColorKey: string) => {
 			const applyCommand = (command: CommandPlot, editor: Editor) => {
+
 				const selectedText = editor.getSelection();
 				const curserStart = editor.getCursor("from");
 				const curserEnd = editor.getCursor("to");
@@ -114,8 +88,8 @@ export default class FontColorPlugin extends Plugin {
 				const suffix = command.suffix || prefix;
 				const setCursor = (mode: number) => {
 					editor.setCursor(
-					curserStart.line + command.line * mode,
-					curserEnd.ch + cursorPos * mode
+						curserStart.line + command.line * mode,
+						curserEnd.ch + cursorPos * mode
 					);
 				};
 				const cursorPos =
@@ -183,14 +157,16 @@ export default class FontColorPlugin extends Plugin {
 
 			Object.keys(commandsMap).forEach((type) => {
 				let fontColorpen = `font-color-pen-${fontColorKey}`.toLowerCase();
+				console.log("CommandsMap", fontColorKey)
 				this.addCommand({
 					id: fontColorKey,
 					name: fontColorKey,
 					icon: fontColorpen,
 					editorCallback: async (editor: Editor) => {
-					applyCommand(commandsMap[type], editor);
-					await wait(10);
-					editor.focus();
+						console.log("Command", fontColorKey)
+						applyCommand(commandsMap[type], editor);
+						await wait(10);
+						editor.focus();
 					},
 				});
 			});
@@ -205,6 +181,8 @@ export default class FontColorPlugin extends Plugin {
 				},
 			});
 		});
+
+		console.log(this.app.commands)
 	}
 	
 	refresh = () => {
@@ -241,7 +219,7 @@ export default class FontColorPlugin extends Plugin {
 		menu: Menu,
 		editor: EnhancedEditor
 	): void => {
-			contextMenu(this.app, menu, editor, this, this.settings);
+		contextMenu(this.app, menu, editor, this, this.settings);
 	};
 
 	async loadSettings() {

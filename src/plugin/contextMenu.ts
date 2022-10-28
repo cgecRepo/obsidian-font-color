@@ -17,7 +17,7 @@ export default function contextMenu(
     const itemDom = (item as any).dom as HTMLElement;
     itemDom.addClass("font-color-button");
     item
-      .setTitle("FontColor")
+      .setTitle("Font Color")
       .setIcon("font-color-pen")
       .onClick(async (e) => {
         fontColorMenu(app, settings, editor);

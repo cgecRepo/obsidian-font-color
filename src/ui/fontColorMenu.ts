@@ -23,7 +23,11 @@ const fontColorMenu = (
         fontColorItem.setTitle(fontColor);
         fontColorItem.setIcon(`font-color-pen-${fontColor}`.toLowerCase());
         fontColorItem.onClick(() => {
-          app.commands.executeCommandById(`font-color-plugin:${fontColor}`);
+          console.log("Font color menu", fontColor)
+
+          const id = `obsidian-font-color:${fontColor}`
+          console.log(id)
+          app.commands.executeCommandById(id);
         });
       });
     });
