@@ -68,6 +68,32 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		});
+		
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu, file) => {
+			  menu.addItem((item) => {
+				item
+				  .setTitle("Print file path 👈")
+				  .setIcon("document")
+				  .onClick(async () => {
+					new Notice(file.path);
+				  });
+			  });
+			})
+		  );
+
+		this.registerEvent(
+			this.app.workspace.on("editor-menu", (menu, editor, view) => {
+			  menu.addItem((item) => {
+				item
+				  .setTitle("Print file path 👈")
+				  .setIcon("document")
+				  .onClick(async () => {
+					new Notice(view.file.path);
+				  });
+			  });
+			})
+		);
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
